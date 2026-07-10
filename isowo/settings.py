@@ -1,5 +1,6 @@
 from pathlib import Path
 from dotenv import load_dotenv
+import urllib.parse
 import os
 
 load_dotenv()
