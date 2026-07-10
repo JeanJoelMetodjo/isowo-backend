@@ -86,26 +86,28 @@ WSGI_APPLICATION = "isowo.wsgi.application"
 #     }
 # }
 
-DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("MYSQL_PUBLIC_URL")
+import urllib.parse
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
-    # Parser manuellement l'URL MySQL pour ajouter SSL proprement
+    # Production — PostgreSQL sur Render
     parsed = urllib.parse.urlparse(DATABASE_URL)
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.mysql",
+            "ENGINE": "django.db.backends.postgresql",
             "NAME": parsed.path.lstrip("/"),
             "USER": parsed.username,
             "PASSWORD": parsed.password,
             "HOST": parsed.hostname,
-            "PORT": str(parsed.port or 3306),
+            "PORT": str(parsed.port or 5432),
             "OPTIONS": {
-                "charset": "utf8mb4",
-                "ssl": {"ssl-mode": "REQUIRED"},
+                "sslmode": "require",
             },
         }
     }
 else:
+    # Local — MySQL
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
