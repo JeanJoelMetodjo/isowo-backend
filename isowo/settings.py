@@ -70,20 +70,54 @@ TEMPLATES = [
 WSGI_APPLICATION = "isowo.wsgi.application"
 
 # Base de données MySQL (Railway en prod, local en dev)
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", "isowo"),
-        "USER": os.getenv("DB_USER", "root"),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "3306"),
-        "OPTIONS": {
-            "charset": "utf8mb4",
-            "ssl": {"ssl-mode": "REQUIRED"} if os.getenv("DB_SSL", "False") == "True" else {},
-        },
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": os.getenv("DB_NAME", "isowo"),
+#         "USER": os.getenv("DB_USER", "root"),
+#         "PASSWORD": os.getenv("DB_PASSWORD", ""),
+#         "HOST": os.getenv("DB_HOST", "localhost"),
+#         "PORT": os.getenv("DB_PORT", "3306"),
+#         "OPTIONS": {
+#             "charset": "utf8mb4",
+#             "ssl": {"ssl-mode": "REQUIRED"} if os.getenv("DB_SSL", "False") == "True" else {},
+#         },
+#     }
+# }
+
+DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("MYSQL_PUBLIC_URL")
+
+if DATABASE_URL:
+    # Parser manuellement l'URL MySQL pour ajouter SSL proprement
+    parsed = urllib.parse.urlparse(DATABASE_URL)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": parsed.path.lstrip("/"),
+            "USER": parsed.username,
+            "PASSWORD": parsed.password,
+            "HOST": parsed.hostname,
+            "PORT": str(parsed.port or 3306),
+            "OPTIONS": {
+                "charset": "utf8mb4",
+                "ssl": {"ssl-mode": "REQUIRED"},
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("DB_NAME", "isowo"),
+            "USER": os.getenv("DB_USER", "root"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "3306"),
+            "OPTIONS": {
+                "charset": "utf8mb4",
+            },
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
