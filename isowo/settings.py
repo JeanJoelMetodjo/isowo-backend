@@ -2,6 +2,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import urllib.parse
 import os
+import dj_database_url
 
 load_dotenv()
 
@@ -86,28 +87,37 @@ WSGI_APPLICATION = "isowo.wsgi.application"
 #     }
 # }
 
-import urllib.parse
-
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
-    # Production — PostgreSQL sur Render
     parsed = urllib.parse.urlparse(DATABASE_URL)
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": parsed.path.lstrip("/"),
-            "USER": parsed.username,
-            "PASSWORD": parsed.password,
-            "HOST": parsed.hostname,
-            "PORT": str(parsed.port or 5432),
-            "OPTIONS": {
-                "sslmode": "require",
-            },
+    if parsed.scheme.startswith("postgres"):
+        DATABASES = {
+            "default": dj_database_url.config(
+                default=DATABASE_URL,
+                conn_max_age=600,
+                ssl_require=True,
+            )
         }
-    }
+    elif parsed.scheme.startswith("mysql"):
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": parsed.path.lstrip("/"),
+                "USER": parsed.username,
+                "PASSWORD": parsed.password,
+                "HOST": parsed.hostname,
+                "PORT": str(parsed.port or 3306),
+                "OPTIONS": {
+                    "charset": "utf8mb4",
+                },
+            }
+        }
+    else:
+        DATABASES = {
+            "default": dj_database_url.parse(DATABASE_URL)
+        }
 else:
-    # Local — MySQL
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
