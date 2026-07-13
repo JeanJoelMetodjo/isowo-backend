@@ -189,7 +189,7 @@ EMAIL_PORT = int(os.getenv("EMAIL_PORT", os.getenv("BREVO_SMTP_PORT", "587")))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", os.getenv("BREVO_SMTP_USERNAME", ""))
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", os.getenv("BREVO_SMTP_PASSWORD", ""))
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", os.getenv("EMAIL_FROM", "noreply@isowo.com"))
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", os.getenv("EMAIL_FROM", os.getenv("EMAIL_HOST_USER", "isowo.jjm@gmail.com")))
 BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
 BREVO_SMTP_HOST = os.getenv("BREVO_SMTP_HOST", "smtp-relay.brevo.com")
 BREVO_SMTP_PORT = int(os.getenv("BREVO_SMTP_PORT", "587"))
