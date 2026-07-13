@@ -183,11 +183,17 @@ CORS_ALLOW_CREDENTIALS = True
 AUTH_USER_MODEL = "authentification.Utilisateur"
 
 # Email
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = f"Isowo <{EMAIL_HOST_USER}>"
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", os.getenv("BREVO_SMTP_HOST", "smtp-relay.brevo.com"))
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", os.getenv("BREVO_SMTP_PORT", "587")))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", os.getenv("BREVO_SMTP_USERNAME", ""))
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", os.getenv("BREVO_SMTP_PASSWORD", ""))
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", os.getenv("EMAIL_FROM", "noreply@isowo.com"))
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
+BREVO_SMTP_HOST = os.getenv("BREVO_SMTP_HOST", "smtp-relay.brevo.com")
+BREVO_SMTP_PORT = int(os.getenv("BREVO_SMTP_PORT", "587"))
+BREVO_SMTP_USERNAME = os.getenv("BREVO_SMTP_USERNAME", EMAIL_HOST_USER)
+BREVO_SMTP_PASSWORD = os.getenv("BREVO_SMTP_PASSWORD", EMAIL_HOST_PASSWORD)
+BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "Isowo")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
